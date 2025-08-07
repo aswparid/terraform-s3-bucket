@@ -1,15 +1,30 @@
 name: Bootstrap Terraform Backend
 
 on:
-  workflow_dispatch:  # Manually trigger via GitHub Actions UI
-  push:
-    paths:
-      - 'bootstrap/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment name (e.g., dev, prod)"
+        required: true
+        type: string
+      region:
+        description: "AWS Region (e.g., eu-west-2)"
+        required: true
+        type: string
+      bucket_name:
+        description: "Name of the S3 bucket for Terraform state"
+        required: true
+        type: string
 
 jobs:
   bootstrap:
     name: Create Terraform Backend (S3 + DynamoDB)
     runs-on: ubuntu-latest
+
+    environment: dev  # 👈 This enforces manual approval
+    permissions:
+      contents: read
+      id-token: write
 
     defaults:
       run:
@@ -39,4 +54,12 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -input=false
+        run: tterraform plan \
+            -var="region=${REGION}" \
+            -var="bucket_name=${BUCKET_NAME}"
+
+      - name: Terraform Apply
+        run: terraform apply \
+            -var="region=${REGION}" \
+            -var="bucket_name=${BUCKET_NAME}" \
+            -auto-approve
