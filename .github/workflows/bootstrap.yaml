@@ -52,15 +52,5 @@ jobs:
       - name: Terraform Plan
         run: terraform -chdir=${{ env.TF_DIR }} plan -var-file=${{ env.TF_ENV_FILE }}
 
-      - name: Wait for Approval Before Apply
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ secrets.GITHUB_TOKEN }}
-          approvers: ${{ github.actor }}
-          minimum-approvals: 1
-          issue-title: "Terraform Apply Approval - ${{ github.event.inputs.environment }}"
-          issue-body: "Approve to apply Terraform for **${{ github.event.inputs.environment }}** environment."
-          exclude-workflow-initiator-as-approver: false
-
       - name: Terraform Apply
         run: terraform -chdir=${{ env.TF_DIR }} apply -var-file=${{ env.TF_ENV_FILE }} -auto-approve
