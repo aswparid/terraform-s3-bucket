@@ -39,13 +39,13 @@ jobs:
           fi
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform -chdir=terraform-s3-bucket init
 
       - name: Terraform Validate
-        run: terraform validate
+        run: terraform -chdir=terraform-s3-bucket validate
 
       - name: Terraform Plan
-        run: terraform plan -var-file="../$TF_ENV_FILE"
+        run: terraform -chdir=terraform-s3-bucket plan -var-file="../$TF_ENV_FILE"
 
       - name: Wait for Approval Before Apply
         uses: trstringer/manual-approval@v1
@@ -58,4 +58,4 @@ jobs:
           exclude-workflow-initiator-as-approver: false
 
       - name: Terraform Apply
-        run: terraform apply -var-file="../$TF_ENV_FILE" -auto-approve
+        run: terraform -chdir=terraform-s3-bucket apply -var-file="../$TF_ENV_FILE" -auto-approve
