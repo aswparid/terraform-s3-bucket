@@ -20,7 +20,7 @@ jobs:
 
     env:
       TF_VAR_environment: ${{ github.event.inputs.environment }}
-      TF_ENV_FILE: environments/${{ github.event.inputs.environment }}.tfvars
+      TF_ENV_FILE: ${{ github.event.inputs.environment }}.tfvars
 
     steps:
       - name: Checkout code
@@ -39,13 +39,13 @@ jobs:
           fi
 
       - name: Terraform Init
-        run: terraform -chdir=terraform-s3-bucket init
+        run: terraform -chdir=bootstrap init
 
       - name: Terraform Validate
-        run: terraform -chdir=terraform-s3-bucket validate
+        run: terraform -chdir=bootstrap validate
 
       - name: Terraform Plan
-        run: terraform -chdir=terraform-s3-bucket plan -var-file="../$TF_ENV_FILE"
+        run: terraform -chdir=bootstrap plan -var-file="../$TF_ENV_FILE"
 
       - name: Wait for Approval Before Apply
         uses: trstringer/manual-approval@v1
@@ -58,4 +58,4 @@ jobs:
           exclude-workflow-initiator-as-approver: false
 
       - name: Terraform Apply
-        run: terraform -chdir=terraform-s3-bucket apply -var-file="../$TF_ENV_FILE" -auto-approve
+        run: terraform -chdir=bootstrap apply -var-file="../$TF_ENV_FILE" -auto-approve
