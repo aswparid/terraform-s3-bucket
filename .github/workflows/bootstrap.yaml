@@ -54,7 +54,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan \
+        run: tterraform plan \
             -var="region=${REGION}" \
             -var="bucket_name=${BUCKET_NAME}"
 
