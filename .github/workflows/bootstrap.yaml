@@ -20,7 +20,8 @@ jobs:
 
     env:
       TF_VAR_environment: ${{ github.event.inputs.environment }}
-      TF_ENV_FILE: ${{ github.event.inputs.environment }}.tfvars
+      TF_ENV_FILE: "${{ github.event.inputs.environment }}.tfvars"
+      TF_DIR: bootstrap
 
     steps:
       - name: Checkout code
@@ -31,21 +32,14 @@ jobs:
         with:
           terraform_version: 1.8.2
 
-      - name: Validate input .tfvars file exists
-        run: |
-          if [ ! -f "$TF_ENV_FILE" ]; then
-            echo "❌ Missing tfvars file: $TF_ENV_FILE"
-            exit 1
-          fi
-
       - name: Terraform Init
-        run: terraform -chdir=bootstrap init
+        run: terraform -chdir=${{ env.TF_DIR }} init
 
       - name: Terraform Validate
-        run: terraform -chdir=bootstrap validate
+        run: terraform -chdir=${{ env.TF_DIR }} validate
 
       - name: Terraform Plan
-        run: terraform -chdir=bootstrap plan -var-file="../$TF_ENV_FILE"
+        run: terraform -chdir=${{ env.TF_DIR }} plan -var-file=${{ env.TF_ENV_FILE }}
 
       - name: Wait for Approval Before Apply
         uses: trstringer/manual-approval@v1
@@ -58,4 +52,4 @@ jobs:
           exclude-workflow-initiator-as-approver: false
 
       - name: Terraform Apply
-        run: terraform -chdir=bootstrap apply -var-file="../$TF_ENV_FILE" -auto-approve
+        run: terraform -chdir=${{ env.TF_DIR }} apply -var-file=${{ env.TF_ENV_FILE }} -auto-approve
