@@ -55,11 +55,11 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan \
-            -var="region=${REGION}" \
-            -var="bucket_name=${BUCKET_NAME}"
+             -var="region=${{ env.REGION }}" \
+             -var="bucket_name=${{ env.BUCKET_NAME }}"
 
       - name: Terraform Apply
         run: terraform apply \
-            -var="region=${REGION}" \
-            -var="bucket_name=${BUCKET_NAME}" \
+            -var="region=${ env.REGION }" \
+            -var="bucket_name=${ env.BUCKET_NAME }" \
             -auto-approve
