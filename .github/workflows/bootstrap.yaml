@@ -11,6 +11,10 @@ on:
           - dev
           - staging
           - prod
+      region:
+        description: 'AWS Region like eu-west-2'
+        required: true
+        default: 'eu-west-2'
 
 jobs:
   terraform-bootstrap:
