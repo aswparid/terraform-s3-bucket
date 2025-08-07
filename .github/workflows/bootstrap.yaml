@@ -45,7 +45,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -var-file="$TF_ENV_FILE"
+        run: terraform plan -var-file="../$TF_ENV_FILE"
 
       - name: Wait for Approval Before Apply
         uses: trstringer/manual-approval@v1
@@ -58,4 +58,4 @@ jobs:
           exclude-workflow-initiator-as-approver: false
 
       - name: Terraform Apply
-        run: terraform apply -var-file="$TF_ENV_FILE" -auto-approve
+        run: terraform apply -var-file="../$TF_ENV_FILE" -auto-approve
