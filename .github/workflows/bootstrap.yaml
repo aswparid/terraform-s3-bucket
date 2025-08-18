@@ -32,11 +32,10 @@ jobs:
           terraform_version: 1.8.5
 
       - name: Terraform Init
-        run: terraform -chdir=bootstrap/environments/${{ github.event.inputs.environment }} init
+        run: terraform -chdir=environments/${{ github.event.inputs.environment }} init
 
       - name: Extract AWS Region
         id: get_region
-        working-directory: ${{ github.workspace }}/bootstrap/environments/${{ github.event.inputs.environment }}
         run: |
           REGION=$(grep '^region' terraform.tfvars | awk -F'=' '{print $2}' | tr -d ' "')
           echo "AWS_REGION=$REGION" >> $GITHUB_ENV
@@ -49,10 +48,10 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Validate
-        run: terraform -chdir=bootstrap/environments/${{ github.event.inputs.environment }} validate
+        run: terraform -chdir=environments/${{ github.event.inputs.environment }} validate
 
       - name: Terraform Plan
-        run: terraform -chdir=bootstrap/environments/${{ github.event.inputs.environment }} plan -var-file="terraform.tfvars"
+        run: terraform -chdir=environments/${{ github.event.inputs.environment }} plan -var-file="terraform.tfvars"
 
       - name: Terraform Apply
-        run: terraform -chdir=bootstrap/environments/${{ github.event.inputs.environment }} apply -var-file="terraform.tfvars" -auto-approve
+        run: terraform -chdir=environments/${{ github.event.inputs.environment }} apply -var-file="terraform.tfvars" -auto-approve
