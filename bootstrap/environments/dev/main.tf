@@ -1,5 +1,5 @@
 module "s3_backend" {
-  source        = "../../bootstrap"
+  source        = "./../../bootstrap"
   bucket_prefix = var.bucket_prefix
   environment   = var.environment
   region        = var.region
