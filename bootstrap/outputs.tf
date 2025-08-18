@@ -1,7 +1,9 @@
-output "s3_bucket" {
-  value = aws_s3_bucket.tf_state.id
+output "bucket_name" {
+  description = "The name of the created S3 bucket"
+  value       = aws_s3_bucket.tf_state_bucket.bucket
 }
 
-output "dynamodb_table" {
-  value = aws_dynamodb_table.tf_lock.id
+output "bucket_arn" {
+  description = "The ARN of the created S3 bucket"
+  value       = aws_s3_bucket.tf_state_bucket.arn
 }
