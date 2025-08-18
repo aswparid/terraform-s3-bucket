@@ -11,10 +11,6 @@ on:
           - dev
           - staging
           - prod
-      region:
-        description: 'AWS Region like eu-west-2'
-        required: true
-        default: 'eu-west-2'
 
 jobs:
   terraform-bootstrap:
@@ -23,34 +19,44 @@ jobs:
     environment: ${{ github.event.inputs.environment }}
 
     env:
-      TF_VAR_environment: ${{ github.event.inputs.environment }}
-      TF_ENV_FILE: "${{ github.event.inputs.environment }}.tfvars"
-      TF_DIR: bootstrap
+      TF_IN_AUTOMATION: true
+      TF_INPUT: false
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: Terraform Init
+        working-directory: environments/${{ github.event.inputs.environment }}
+        run: terraform init
+
+      - name: Extract AWS Region
+        id: get_region
+        working-directory: environments/${{ github.event.inputs.environment }}
+        run: |
+          REGION=$(grep '^region' terraform.tfvars | awk -F'=' '{print $2}' | tr -d ' "')
+          echo "AWS_REGION=$REGION" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ github.event.inputs.region }}
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.8.2
-
-      - name: Terraform Init
-        run: terraform -chdir=${{ env.TF_DIR }} init
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Validate
-        run: terraform -chdir=${{ env.TF_DIR }} validate
+        working-directory: environments/${{ github.event.inputs.environment }}
+        run: terraform validate
 
       - name: Terraform Plan
-        run: terraform -chdir=${{ env.TF_DIR }} plan -var-file=${{ env.TF_ENV_FILE }}
+        working-directory: environments/${{ github.event.inputs.environment }}
+        run: terraform plan -var-file="terraform.tfvars"
 
       - name: Terraform Apply
-        run: terraform -chdir=${{ env.TF_DIR }} apply -var-file=${{ env.TF_ENV_FILE }} -auto-approve
+        working-directory: environments/${{ github.event.inputs.environment }}
+        run: terraform apply -var-file="terraform.tfvars" -auto-approve
