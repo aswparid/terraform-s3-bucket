@@ -36,6 +36,7 @@ jobs:
 
       - name: Extract AWS Region
         id: get_region
+        working-directory: environments/${{ github.event.inputs.environment }}
         run: |
           REGION=$(grep '^region' terraform.tfvars | awk -F'=' '{print $2}' | tr -d ' "')
           echo "AWS_REGION=$REGION" >> $GITHUB_ENV
